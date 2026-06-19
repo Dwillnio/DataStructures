@@ -5,7 +5,7 @@
 #include "List.h"
 
 template<typename T>
-class Vector :public List<T> 
+class Vector : public List<T> 
 {
 private:
 	T* array;
@@ -59,7 +59,7 @@ public:
 		array = static_cast<T*>(mem);
 
 		for (unsigned int i = 0; i < sz; i++) {
-			new(array[i]) T(v.array[i]);
+			new(&array[i]) T(v.array[i]);
 		}
 	}
 
@@ -88,7 +88,7 @@ public:
 		array = static_cast<T*>(mem);
 
 		for (unsigned int i = 0; i < sz; i++) {
-			new(array[i]) T(v.array[i]);
+			new(&array[i]) T(v.array[i]);
 		}
 
 		return *this;

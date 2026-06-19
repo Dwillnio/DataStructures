@@ -8,6 +8,7 @@
 #include "BasicSort.h"
 #include "MergeSort.h"
 #include "QuickSort.h"
+#include "Heap.h"
 #include "HeapSort.h"
 
 #define MOVE_ENABLED
@@ -204,11 +205,18 @@ int main() {
 
 	print_list(list);
 	std::cout << std::endl;
+
+	Heap<int> h(list);
+
+	print_list(h.as_vector());
 	
 	QuickSort<int> s;
 	s.sort(list);
 
-	print_list(list);
+
+
+
+	//print_list(list);
 
 	//std::cout << QuickSort<int>::find(list, 7) << std::endl;
 
