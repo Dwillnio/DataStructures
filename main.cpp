@@ -10,6 +10,8 @@
 #include "QuickSort.h"
 #include "Heap.h"
 #include "HeapSort.h"
+#include "Stack.h"
+#include "Queue.h"
 
 #define MOVE_ENABLED
 
@@ -192,8 +194,8 @@ void INT_Array_test()
 
 int main() {
 	//LinkedList<int> list;
-	//DoublyLinkedList<int> list;
-	Vector<int> list;
+	DoublyLinkedList<int> list;
+	//Vector<int> list;
 	//list_test1(list);
 	list.push(4);
 	list.push(6);
@@ -206,14 +208,19 @@ int main() {
 	print_list(list);
 	std::cout << std::endl;
 
-	Heap<int> h(list);
+	//Heap<int> h(list);
 
-	print_list(h.as_vector());
+	//print_list(h.as_vector());
 	
 	QuickSort<int> s;
 	s.sort(list);
 
+	Queue<int> st;
+	st.enqueue(1).enqueue(3).enqueue(5);
 
+	while (!st.is_empty()) {
+		std::cout << st.dequeue() << std::endl;
+	}
 
 
 	//print_list(list);
