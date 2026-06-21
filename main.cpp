@@ -12,6 +12,7 @@
 #include "HeapSort.h"
 #include "Stack.h"
 #include "Queue.h"
+#include "BinaryTree.h"
 
 #define MOVE_ENABLED
 
@@ -193,6 +194,7 @@ void INT_Array_test()
 }
 
 int main() {
+	/*
 	//LinkedList<int> list;
 	DoublyLinkedList<int> list;
 	//Vector<int> list;
@@ -226,6 +228,49 @@ int main() {
 	//print_list(list);
 
 	//std::cout << QuickSort<int>::find(list, 7) << std::endl;
+	*/
+
+	BinarySearchTree<std::string, int> bt;
+	bt.push("A", 5);
+	bt.push("B", 3);
+	bt.push("C", 6);
+	bt.push("D", 4);
+
+	std::cout << "Tree size: " << bt.size() << "\t Tree height: " << bt.height() << std::endl;
+	std::cout << "As ordered list: ";
+	auto l = bt.to_vector();
+	for (unsigned int i = 0; i < l.size(); i++) {
+		std::cout << l[i] << " ";
+	}
+	std::cout << std::endl;
+
+	bt.print_tree();
+	std::cout << std::endl;
+
+	bt.remove(3);
+
+	bt.print_tree();
+	std::cout << std::endl;
+
+	bt.remove(5);
+
+	bt.print_tree();
+	std::cout << std::endl;
+
+	std::cout << bt.at(4) << std::endl << std::endl;
+
+	bt.clear();
+	bt.push("A", 1);
+	bt.push("B", 2);
+	bt.push("C", 4);
+	bt.push("D", 8);
+	bt.push("E", 16);
+	bt.print_tree();
+	std::cout << std::endl;
+
+
+	bt.remove(4);
+	bt.print_tree();
 
 	return 0;
 }

@@ -63,7 +63,7 @@ public:
 		}
 	}
 
-	Vector(Vector<T>&& v)
+	Vector(Vector<T>&& v) noexcept
 	{
 		sz = v.sz;
 		allocated = v.allocated;
