@@ -42,6 +42,15 @@ public:
 	virtual void clear() = 0;
 
 	virtual ~List() = default;
+
+	virtual int find(const T& value) const
+	{
+		int i = 0;
+		for (; i < (int)size(); i++) {
+			if (at(i) == value) return i;
+		}
+		return -1;
+	}
 };
 
 template<typename T>

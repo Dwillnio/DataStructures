@@ -14,9 +14,9 @@
 #include "Queue.h"
 #include "BinaryTree.h"
 #include "AVLTree.h"
+#include "Graph.h"
 
 #define MOVE_ENABLED
-
 
 static void list_test1(List<int>& list)
 {
@@ -54,6 +54,43 @@ static void list_test1(List<int>& list)
 
 	print_list(list);
 	std::cout << std::endl;
+}
+
+void list_test2()
+{
+	//LinkedList<int> list;
+	DoublyLinkedList<int> list;
+	//Vector<int> list;
+	//list_test1(list);
+	list.push(4);
+	list.push(6);
+	list.push(2);
+	list.push(1);
+	list.push(3);
+	list.push(8);
+	list.push(0);
+
+	print_list(list);
+	std::cout << std::endl;
+
+	//Heap<int> h(list);
+
+	//print_list(h.as_vector());
+
+	QuickSort<int> s;
+	s.sort(list);
+
+	Queue<int> st;
+	st.enqueue(1).enqueue(3).enqueue(5);
+
+	while (!st.is_empty()) {
+		std::cout << st.dequeue() << std::endl;
+	}
+
+
+	//print_list(list);
+
+	//std::cout << QuickSort<int>::find(list, 7) << std::endl;
 }
 
 class INT_Array
@@ -194,43 +231,8 @@ void INT_Array_test()
 
 }
 
-int main() {
-	/*
-	//LinkedList<int> list;
-	DoublyLinkedList<int> list;
-	//Vector<int> list;
-	//list_test1(list);
-	list.push(4);
-	list.push(6);
-	list.push(2);
-	list.push(1);
-	list.push(3);
-	list.push(8);
-	list.push(0);
-
-	print_list(list);
-	std::cout << std::endl;
-
-	//Heap<int> h(list);
-
-	//print_list(h.as_vector());
-	
-	QuickSort<int> s;
-	s.sort(list);
-
-	Queue<int> st;
-	st.enqueue(1).enqueue(3).enqueue(5);
-
-	while (!st.is_empty()) {
-		std::cout << st.dequeue() << std::endl;
-	}
-
-
-	//print_list(list);
-
-	//std::cout << QuickSort<int>::find(list, 7) << std::endl;
-	*/
-
+void Search_Tree_test() 
+{
 	AVLTree<std::string, int> bt;
 	bt.insert("A", 5);
 	bt.insert("B", 3);
@@ -272,6 +274,30 @@ int main() {
 
 	bt.remove(4);
 	bt.print_tree();
+}
+
+int main() {
+	///*
+	Graph<std::string, int> g;
+
+	g.add("A");
+	g.add("B");
+	g.add("C");
+	g.add("D");
+	g.add("E");
+
+	g.print();
+
+	g.add_edge("A","B", true);
+	g.add_edge("A", "D", true);
+	g.add_edge("B", "C", false);
+
+	g.set_edge("C", "A", 3);
+
+	g.remove_edge("D", "A");
+
+	g.print();
+	
 
 	return 0;
 }

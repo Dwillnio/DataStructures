@@ -74,6 +74,16 @@ public:
 		v.array = 0;
 	}
 
+	bool operator==(const Vector<T>& v) const
+	{
+		if (size() != v.size()) return false;
+
+		for (unsigned int i = 0; i < size(); i++) {
+			if (at(i) != v.at(i)) return false;
+		}
+		return true;
+	}
+
 	Vector<T>& operator=(const Vector<T>& v)
 	{
 		if (this == &v) return *this;
