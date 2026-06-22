@@ -12,7 +12,7 @@
 template<typename T, typename keyT>
 class TreeNode
 {
-private:
+protected:
 	TreeNode<T,keyT>* l,* r;
 
 	T data;
@@ -42,7 +42,7 @@ public:
 template<typename T, typename keyT>
 class BinarySearchTree
 {
-private:
+protected:
 	TreeNode<T, keyT>* root;
 
 	void clear_down(TreeNode<T, keyT>* node)
@@ -70,11 +70,11 @@ private:
 	void move_down(TreeNode<T, keyT>* target, TreeNode<T, keyT>* source)
 	{
 		if (source->has_left()) {
-			target->set_left(new TreeNode<T>(std::move(source->left())));
+			target->set_left(new TreeNode<T, keyT>(std::move(source->left())));
 			move_down(target->left(), source->left());
 		}
 		if (source->has_right()) {
-			target->set_right(new TreeNode<T>(std::move(source->right())));
+			target->set_right(new TreeNode<T, keyT>(std::move(source->right())));
 			move_down(target->right(), source->right());
 		}
 	}
@@ -144,15 +144,75 @@ private:
 		if (n->has_right()) to_vector_down(v, n->right());
 	}
 
-	void push_down(TreeNode<T, keyT>* n, const T& val, const keyT& key)
+	void insert_down(TreeNode<T, keyT>* n, const T& val, const keyT& key)
 	{
 		if (key <= n->get_key()) {
-			if (n->has_left()) push_down(n->left(), val, key);
+			if (n->has_left()) insert_down(n->left(), val, key);
 			else n->set_left(new TreeNode<T, keyT>(val, key));
 		}
 		else {
-			if (n->has_right()) push_down(n->right(), val, key);
+			if (n->has_right()) insert_down(n->right(), val, key);
 			else n->set_right(new TreeNode<T, keyT>(val, key));
+		}
+	}
+
+	// n == parent->left() or n == parent->right()
+	TreeNode<T, keyT>* remove_down(TreeNode<T, keyT>* n, TreeNode<T, keyT>* parent, const keyT& key)
+	{
+		if (n->get_key() == key) {
+			bool l;
+			if (parent->has_left() && parent->left()->get_key() == key) {
+				n = parent->left();
+				l = true;
+			}
+			else {
+				n = parent->right();
+				l = false;
+			}
+
+			if (!n->has_left() && !n->has_right()) {
+				delete_node(n, parent);
+			}
+			else if (n->has_left()) {
+				TreeNode<T, keyT>* cur = n->left(), * prev = n; // prev is parent of cur
+				TreeNode<T, keyT>* r = n->right();
+				if (!cur->has_right()) {
+					replace_up(n, parent, cur);
+				}
+
+				while (cur->has_right()) {
+					prev = cur;
+					cur = cur->right();
+				}
+
+				if (cur->has_left()) {
+					replace_up(cur, prev, cur->left());
+				}
+				else if (prev != n) {
+					prev->set_right(nullptr);
+				}
+				else {
+					prev->set_left(nullptr);
+				}
+
+				l ? parent->set_left(cur) : parent->set_right(cur);
+				
+				cur->set_right(r);
+			}
+			else {
+				replace_up(n, parent, n->right());
+			}
+
+			return n;
+		}
+		else if (key < n->get_key() && n->has_left()) {
+			return remove_down(n->left(), n, key);
+		}
+		else if (n->get_key() < key && n->has_right()) {
+			return remove_down(n->right(), n, key);
+		}
+		else {
+			return nullptr;
 		}
 	}
 
@@ -223,13 +283,13 @@ public:
 	unsigned int size() { return root == nullptr ? 0 : size(root); }
 	unsigned int height() { return root == nullptr ? 0 : height(root); }
 
-	BinarySearchTree<T, keyT>& push(const T& val, const keyT& key)
+	BinarySearchTree<T, keyT>& insert(const T& val, const keyT& key)
 	{
 		if (root == nullptr) {
 			root = new TreeNode<T, keyT>(val, key);
 		}
 		else{
-			push_down(root, val, key);
+			insert_down(root, val, key);
 		}
 
 		return *this;
@@ -275,61 +335,10 @@ public:
 
 		}
 		else {
-			TreeNode<T, keyT>* p(find_parent(root, key)),* n;
-			if (p == nullptr) throw new std::exception("Could not find key to be removed");
-
-			bool l;
-			if (p->has_left() && p->left()->get_key() == key) {
-				n = p->left();
-				l = true;
-			}
-			else {
-				n = p->right();
-				l = false;
-			}
-
-
-			if (!n->has_left() && !n->has_right()) {
-				delete_node(n, p);
-			}
-			else if (n->has_left()) {
-				TreeNode<T, keyT>* cur = n->left(),* prev = n; // prev is parent of cur
-				TreeNode<T, keyT>* r = n->right();
-				if (!cur->has_right()) {
-					replace_up(n, p, cur);
-				}
-
-				while (cur->has_right()) {
-					prev = cur;
-					cur = cur->right();
-				}
-
-				if (cur->has_left()) {
-					replace_up(cur, prev, cur->left());
-				}
-				else if (prev != n){
-					prev->set_right(nullptr);
-				}
-				else {
-					prev->set_left(nullptr);
-				}
-
-				if (l) {
-					p->set_left(cur);
-				}
-				else {
-					p->set_right(cur);
-				}
-				cur->set_right(r);
-			}
-			else {
-				replace_up(n, p, n->right());
-			}
-
+			TreeNode<T, keyT>* n = remove_down(root, root, key);
 			delete n;
 		}
 		
-
 		return *this;
 	}
 

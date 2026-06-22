@@ -13,6 +13,7 @@
 #include "Stack.h"
 #include "Queue.h"
 #include "BinaryTree.h"
+#include "AVLTree.h"
 
 #define MOVE_ENABLED
 
@@ -230,11 +231,11 @@ int main() {
 	//std::cout << QuickSort<int>::find(list, 7) << std::endl;
 	*/
 
-	BinarySearchTree<std::string, int> bt;
-	bt.push("A", 5);
-	bt.push("B", 3);
-	bt.push("C", 6);
-	bt.push("D", 4);
+	AVLTree<std::string, int> bt;
+	bt.insert("A", 5);
+	bt.insert("B", 3);
+	bt.insert("C", 6);
+	bt.insert("D", 4);
 
 	std::cout << "Tree size: " << bt.size() << "\t Tree height: " << bt.height() << std::endl;
 	std::cout << "As ordered list: ";
@@ -260,11 +261,11 @@ int main() {
 	std::cout << bt.at(4) << std::endl << std::endl;
 
 	bt.clear();
-	bt.push("A", 1);
-	bt.push("B", 2);
-	bt.push("C", 4);
-	bt.push("D", 8);
-	bt.push("E", 16);
+	bt.insert("A", 1);
+	bt.insert("B", 2);
+	bt.insert("C", 4);
+	bt.insert("D", 8);
+	bt.insert("E", 16);
 	bt.print_tree();
 	std::cout << std::endl;
 
