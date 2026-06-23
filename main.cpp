@@ -305,6 +305,8 @@ int main() {
 	std::cout << "Cyclic: " << g.is_cyclic() << std::endl;
 	std::cout << "Connected: " << g.is_connected() << std::endl;
 
+	std::cout << "Distance from B to D: " << g.dist("B", "D") << std::endl;
+
 	Vector<std::string> v = g.traverse("A");
 	for (unsigned int i = 0; i < v.size(); i++) {
 		std::cout << v[i] << " ";

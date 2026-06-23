@@ -11,7 +11,7 @@ template<typename nodeT, typename weightT>
 class Graph
 {
 	template<typename nodeT, typename weightT>
-	friend std::ostream& operator<<(std::ostream&, const Graph<nodeT,weightT>&);
+	friend std::ostream& operator<<(std::ostream&, const Graph<nodeT, weightT>&);
 
 	using T = nodeT;
 	using W = weightT;
@@ -20,14 +20,14 @@ private:
 	Vector<T> nodes;
 	Vector<Vector<W>> adjacency_matrix;
 
-	static const int CONNECTED = 0;
+	static const int CONNECTED = 1;
 	static const int NOEDGE = -1;
 
 	int node_index(const T& node) const { return nodes.find(node); }
 
 	W edge_value_ind(unsigned int i, unsigned int j) const { return adjacency_matrix[i][j]; }
 
-	bool connected_ind(unsigned int i, unsigned int j) const { return edge_value_ind(i,j) >= 0; }
+	bool connected_ind(unsigned int i, unsigned int j) const { return edge_value_ind(i, j) >= 0; }
 
 	Vector<unsigned int> traverse_ind(unsigned int start_index) const
 	{
@@ -74,7 +74,7 @@ private:
 		for (unsigned int i = 0; i < size(); i++) {
 			if (i != prev && connected_ind(index, i)) {
 				if (!visited.contains(i)) {
-					if(is_cyclic(i, index, visited)) return true;
+					if (is_cyclic(i, index, visited)) return true;
 				}
 				else {
 					return true;
@@ -103,6 +103,72 @@ private:
 		return false;
 	}
 
+	// return pair of distances to start_index and previous node in shortest path
+	std::pair<Vector<int>, Vector<unsigned int>> dijkstra_ind(unsigned int start_index)
+	{
+		Vector<int> distances(size());
+		Vector<unsigned int> unvisited(size());
+		Vector<unsigned int> previous(size());
+		for (unsigned int i = 0; i < size(); i++) {
+			distances.push(-1);
+			unvisited.push(i);
+			previous.push(i);
+		}
+		distances[start_index] = 0;
+
+		unsigned int current = start_index;
+		unsigned int current_index = start_index;
+		while (unvisited.size() > 0) {
+			for (unsigned int i = 0; i < size(); i++) {
+				if (connected_ind(current, i) &&
+					((distances[current] + adjacency_matrix[current][i] < distances[i]) || distances[i] == -1)) {
+					distances[i] = distances[current] + adjacency_matrix[current][i];
+					previous[i] = current;
+				}
+			}
+
+			int lowest_dist = -1;
+			for (unsigned int i = 0; i < unvisited.size(); i++) {
+				if (distances[unvisited[i]] >= 0 && (distances[unvisited[i]] < lowest_dist) || lowest_dist == -1) {
+					lowest_dist = distances[unvisited[i]];
+					current = unvisited[i];
+					current_index = i;
+				}
+			}
+			unvisited.remove(current_index);
+		}
+
+		/*
+		std::cout << "Distance to " << nodes[start_index] << std::endl;
+		for (unsigned int i = 0; i < distances.size(); i++) {
+			std::cout << nodes[i] << ": " << distances[i] << std::endl;
+		}
+		*/
+
+		return std::make_pair(distances, previous);
+	}
+
+	std::pair<int, Vector<unsigned int>> dist_ind(unsigned int start_index, unsigned int end_index)
+	{
+		auto d = dijkstra_ind(start_index);
+
+		int distance = d.first[end_index];
+
+		Vector<unsigned int> prev = d.second;
+		Vector<unsigned int> path;
+
+		unsigned int cur = prev[end_index];
+		if (cur != end_index) {
+			path.push(cur);
+			while (cur != start_index) {
+				cur = prev[cur];
+				path.push(cur);
+			}
+		}
+
+		return std::make_pair(distance, path);
+	}
+
 public:
 
 	//all default (can be left out)
@@ -125,9 +191,9 @@ public:
 
 	// adjacency_matrix[i][j] == -1 means i not connected to j
 	// value of edge i -> j
-	W edge_value(const T& node_one, const T& node_two) const { return adjacency_matrix[node_index(node_one)][node_index(node_two)]; } 
+	W edge_value(const T& node_one, const T& node_two) const { return adjacency_matrix[node_index(node_one)][node_index(node_two)]; }
 
-	bool connected(const T& node_one, const T& node_two) const { return edge_value(node_one, node_two) >= 0; } 
+	bool connected(const T& node_one, const T& node_two) const { return edge_value(node_one, node_two) >= 0; }
 
 	void set_edge(const T& node_one, const T& node_two, W value, bool undirected = false)
 	{
@@ -167,11 +233,11 @@ public:
 	T& operator[](unsigned int index) { return at(index); }
 	const T& operator[](unsigned int index) const { return at(index); }
 
-	unsigned int size() const { return nodes.size(); } 
+	unsigned int size() const { return nodes.size(); }
 
 	bool is_empty() const { return size() == 0; }
 
-	bool is_undirected() const 
+	bool is_undirected() const
 	{
 		for (unsigned int i = 0; i < size(); i++) {
 			for (unsigned int j = 0; j < size(); j++) {
@@ -183,7 +249,7 @@ public:
 
 	void print() const { std::cout << *this; }
 
-	const Vector<T> to_vector() const { return nodes; } 
+	const Vector<T> to_vector() const { return nodes; }
 
 	Vector<T> traverse() const
 	{
@@ -195,7 +261,7 @@ public:
 	Vector<T> traverse(const T& start_node) const
 	{
 		Vector<unsigned int> visited = traverse_ind(node_index(start_node));
-		
+
 		Vector<T> r(visited.size());
 		for (unsigned int i = 0; i < visited.size(); i++) {
 			r.push(nodes[visited[i]]);
@@ -222,7 +288,7 @@ public:
 	{
 		Graph<T, W> g(*this);
 		for (unsigned int i = 0; i < size(); i++) {
-			for (unsigned int j = 0; j < size()/2; j++) {
+			for (unsigned int j = 0; j < size() / 2; j++) {
 				g.adjacency_matrix[i][j] = std::max(g.adjacency_matrix[i][j], g.adjacency_matrix[j][i]);
 				g.adjacency_matrix[j][i] = g.adjacency_matrix[i][j];
 			}
@@ -277,6 +343,47 @@ public:
 
 		return g;
 	}
+
+	// returns two lists, the first giving the distances to node_one and the second giving the previous node in the shortest path
+	std::pair<Vector<int>, Vector<T>> dijkstra(const T& node_one)
+	{
+		auto r = dijkstra_ind(node_index(node_one));
+		Vector<int> distances(r.first.size());
+		Vector<T> paths(r.second.size());
+		for (unsigned int i = 0; i < r.second.size(); i++) {
+			distances.push(r.first[i]);
+			paths.push(nodes[r.second[i]]);
+		}
+
+		return std::make_pair(distances, paths);
+	}
+
+	std::pair<int, Vector<T>> shortest_path(const T& node_one, const T& node_two) 
+	{
+		auto r = dist_ind(node_index(node_one), node_index(node_two));
+
+
+		Vector<T> path(r.second.size());
+		for (unsigned int i = 0; i < r.second.size(); i++) {
+			path.push(nodes[r.second[i]]);
+		}
+
+		return std::make_pair(r.first, path);
+	}
+
+	// calculates node distance using Dijkstra 
+	int dist(const T& node_one, const T& node_two)
+	{
+		auto r = dist_ind(node_index(node_one), node_index(node_two));
+
+		return r.first;
+	}
+
+	std::pair<Vector<int>, Vector<unsigned int>> dijkstra_ind(const T& start_node)
+	{
+		return dijkstra_ind(node_index(start_node));
+	}
+
 };
 
 ///*
