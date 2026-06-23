@@ -26,9 +26,11 @@ public:
 
 	~Stack() = default;
 
-	unsigned int size() { return DoublyLinkedList<T>::size(); }
+	unsigned int size() const { return DoublyLinkedList<T>::size(); }
 
-	bool is_empty() { return size() == 0; }
+	bool is_empty() const { return size() == 0; }
+
+	bool contains(const T& value) const { return DoublyLinkedList<T>::find(value); }
 
 	T& top() { return DoublyLinkedList<T>::at(0); }
 

@@ -51,6 +51,8 @@ public:
 		}
 		return -1;
 	}
+
+	virtual bool contains(const T& value) const { return find(value) >= 0; }
 };
 
 template<typename T>

@@ -288,16 +288,28 @@ int main() {
 
 	g.print();
 
-	g.add_edge("A","B", true);
+	g.add_edge("A", "B", true);
 	g.add_edge("A", "D", true);
-	g.add_edge("B", "C", false);
-
-	g.set_edge("C", "A", 3);
-
-	g.remove_edge("D", "A");
+	g.add_edge("B", "C", true);
 
 	g.print();
 	
+	std::cout << "Cyclic: " << g.is_cyclic() << std::endl;
+	std::cout << "Connected: " << g.is_connected() << std::endl;
+
+	g.add_edge("A", "C", true);
+	g.add_edge("D", "E", true);
+
+	g.print();
+
+	std::cout << "Cyclic: " << g.is_cyclic() << std::endl;
+	std::cout << "Connected: " << g.is_connected() << std::endl;
+
+	Vector<std::string> v = g.traverse("A");
+	for (unsigned int i = 0; i < v.size(); i++) {
+		std::cout << v[i] << " ";
+	}
+	std::cout << std::endl;
 
 	return 0;
 }
