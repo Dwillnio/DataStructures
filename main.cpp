@@ -276,8 +276,54 @@ void Search_Tree_test()
 	bt.print_tree();
 }
 
+///*
+void MST_test()
+{
+	Graph<std::string, int> g;
+
+	g.add("A");
+	g.add("B");
+	g.add("C");
+	g.add("D");
+	g.add("E");
+	g.add("F");
+	g.add("G");
+	g.add("H");
+
+	g.set_edge("A", "B", 4, true);
+	g.set_edge("B", "C", 3, true);
+	g.set_edge("C", "H", 2, true);
+	g.set_edge("A", "D", 3, true);
+	g.set_edge("B", "D", 5, true);
+	g.set_edge("B", "E", 6, true);
+	g.set_edge("C", "E", 4, true);
+	g.set_edge("H", "G", 5, true);
+	g.set_edge("E", "G", 3, true);
+	g.set_edge("D", "F", 4, true);
+	g.set_edge("E", "E", 7, true);
+	g.set_edge("F", "E", 5, true);
+	g.set_edge("F", "G", 7, true);
+
+	g.print();
+	std::cout << std::endl;
+
+	auto h1 = g.minimal_spanning_tree();
+	auto h2 = g.minimal_spanning_tree_kruskal();
+	h1.print();
+	h2.print();
+	std::cout << h2.is_cyclic();
+}
+//*/
+
 int main() {
-	///*
+	Edge<int> e1{ 0,1,5 }, e2{ 2,3,6 }, e3{ 3,1,5 };
+	std::cout << (e1 == e2) << std::endl;
+	std::cout << (e1 < e2) << std::endl;
+	std::cout << (e1 == e3) << std::endl;
+
+
+	MST_test();
+	/*
 	Graph<std::string, int> g;
 
 	g.add("A");
@@ -307,11 +353,9 @@ int main() {
 
 	std::cout << "Distance from B to D: " << g.dist("B", "D") << std::endl;
 
-	Vector<std::string> v = g.traverse("A");
-	for (unsigned int i = 0; i < v.size(); i++) {
-		std::cout << v[i] << " ";
-	}
-	std::cout << std::endl;
+	auto h = g.minimal_spanning_tree();
+	h.print();
+	*/
 
 	return 0;
 }

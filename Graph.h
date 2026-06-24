@@ -6,6 +6,20 @@
 #include "Vector.h"
 #include "Stack.h"
 #include "Queue.h"
+#include "MergeSort.h"
+
+template<typename weightT>
+struct Edge
+{
+	unsigned int index_from, index_to;
+	weightT weight;
+
+	bool operator< (const Edge<weightT>& e) const { return weight < e.weight; }
+	bool operator<= (const Edge<weightT>& e) const { return weight <= e.weight; }
+	bool operator== (const Edge<weightT>& e) const { return weight == e.weight; }
+	bool operator> (const Edge<weightT>& e) const { return weight > e.weight; }
+	bool operator>= (const Edge<weightT>& e) const { return weight >= e.weight; }
+};
 
 template<typename nodeT, typename weightT>
 class Graph
@@ -384,7 +398,104 @@ public:
 		return dijkstra_ind(node_index(start_node));
 	}
 
+	// Prim algorithm for minimal spanning tree of a connected undirected graph
+	Graph<T, W> minimal_spanning_tree() { return (size() == 0 ? Graph<T,W>() : minimal_spanning_tree(nodes[0])); }
+
+	Graph<T, W> minimal_spanning_tree(const T& start_node)
+	{
+		Graph<T, W> g;
+		for (unsigned int i = 0; i < size(); i++){
+			g.add(nodes[i]);
+		}
+
+		if (size() == 0) return g;
+
+		Vector<bool> in_mst(size());
+		Vector<int> parent(size());
+
+		for (unsigned int i = 0; i < size(); i++) {
+			in_mst.push(false);
+			parent.push(-1);
+		}
+		unsigned int start_index = node_index(start_node);
+		in_mst[start_index] = true;
+		for (unsigned int i = 0; i < size(); i++) {
+			if (i != start_index && connected_ind(start_index, i)) parent[i] = start_index;
+		}
+
+		for (unsigned int k = 0; k < size()-1; k++) {
+			int smallest_weight = INT_MAX;
+			unsigned int index_smallest_from = -1, index_smallest_to = -1;
+
+			for (unsigned int i = 0; i < size(); i++) {
+				if (!in_mst[i] && parent[i] != -1 && adjacency_matrix[parent[i]][i] < smallest_weight) {
+					smallest_weight = adjacency_matrix[parent[i]][i];
+					index_smallest_from = parent[i];
+					index_smallest_to = i;
+				}
+			}
+
+
+			g.adjacency_matrix[index_smallest_from][index_smallest_to] = smallest_weight;
+			g.adjacency_matrix[index_smallest_to][index_smallest_from] = smallest_weight;
+			in_mst[index_smallest_to] = true;
+
+			for (unsigned int i = 0; i < size(); i++) {
+				if (!in_mst[i] && connected_ind(index_smallest_to, i)
+					&& (parent[i] == -1 || adjacency_matrix[index_smallest_to][i] < adjacency_matrix[parent[i]][i])) {
+					parent[i] = index_smallest_to;
+				}
+			}
+		}
+		return g;
+	}
+
+	///*
+	Graph<T, W> minimal_spanning_tree_kruskal()
+	{
+		Graph<T, W> g;
+		for (unsigned int i = 0; i < size(); i++) {
+			g.add(nodes[i]);
+		}
+
+		if (size() == 0) return g;
+
+		Vector<Edge<W>> sorted_edges;
+		for (unsigned int i = 0; i < size(); i++) {
+			for (unsigned int j = 0; j < size(); j++) {
+				sorted_edges.push(Edge<W>{ i, j, adjacency_matrix[i][j] });
+			}
+		}
+
+		
+
+		MergeSort<Edge<W>>().sort(sorted_edges);
+		unsigned int lower_bound = size()-1;
+
+		for (unsigned int i = 0; i < sorted_edges.size(); i++) {
+			if (sorted_edges[i].weight != -1) {
+				lower_bound = i;
+				break;
+			}
+		}
+
+		for (unsigned int i = 0; i < sorted_edges.size(); i++) {
+			g.adjacency_matrix[sorted_edges[i].index_from][sorted_edges[i].index_to] = sorted_edges[i].weight;
+			g.adjacency_matrix[sorted_edges[i].index_to][sorted_edges[i].index_from] = sorted_edges[i].weight;
+
+			if (g.is_cyclic()) {	// not efficient
+				g.adjacency_matrix[sorted_edges[i].index_from][sorted_edges[i].index_to] = NOEDGE;
+				g.adjacency_matrix[sorted_edges[i].index_to][sorted_edges[i].index_from] = NOEDGE;
+			}
+		}
+
+		return g;
+	}
+	//*/
+
 };
+
+
 
 ///*
 template<typename nodeT, typename weightT>
@@ -399,7 +510,8 @@ std::ostream& operator<<(std::ostream& os, const Graph<nodeT, weightT>& g)
 	for (unsigned int i = 0; i < g.adjacency_matrix.size(); i++) {
 		os << g.nodes[i] << "\t";
 		for (unsigned int j = 0; j < g.adjacency_matrix.size(); j++) {
-			os << g.adjacency_matrix[i][j] << "\t";
+			if (g.adjacency_matrix[i][j] == Graph<nodeT, weightT>::NOEDGE) os << "\t";
+			else os << g.adjacency_matrix[i][j] << "\t";
 		}
 		os << std::endl;
 	}

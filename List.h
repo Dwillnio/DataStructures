@@ -45,8 +45,7 @@ public:
 
 	virtual int find(const T& value) const
 	{
-		int i = 0;
-		for (; i < (int)size(); i++) {
+		for (unsigned int i = 0; i < size(); i++) {
 			if (at(i) == value) return i;
 		}
 		return -1;
