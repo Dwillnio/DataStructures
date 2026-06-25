@@ -3,9 +3,14 @@
 #include<utility>
 
 #include "List.h"
+#include "Iterator.h"
+
 
 template<typename T>
-class Vector : public List<T> 
+class VIterator;
+
+template<typename T>
+class Vector : public IteratorList<T> 
 {
 private:
 	T* array;
@@ -210,4 +215,71 @@ public:
 	{
 		clear();
 	}
+
+
+	Iterator<T> begin() override;
+
+	Iterator<T> end() override;
 };
+
+template<typename T>
+class VIterator : public IteratorInterface<T> {
+
+private:
+	Vector<T>& vec;
+	unsigned int index;
+
+public:
+	VIterator() = delete;
+	VIterator(Vector<T>& vec_, unsigned int index_) : vec(vec_), index(index_) {};
+
+	T& get() override { return vec[index]; }
+	const T& get() const override { return vec[index]; }
+	T& next() override { return vec[++index]; }
+	T& prev() override { return vec[--index]; }
+
+	bool is_beg() const override { return index == 0; }
+	bool is_end() const override { return index == vec.size() - 1; }
+	bool is_valid() const override { return index >= 0 &&  index < vec.size(); }
+
+	T& operator++() override { return next(); }
+	T& operator+(int amount) override { return move(amount); }
+	T& operator--() override { return prev(); }
+	T& operator-(int amount) override { return move(-amount); }
+	T& move(int amount) override
+	{
+		//if (index + amount < 0 || index + amount >= vec.size()) throw new std::exception("Moving Iterator out of bounds");
+		index += amount;
+		return vec[index];
+	}
+
+	bool equals(const IteratorInterface<T>& iter) const
+	{
+		if (typeid(*this) == typeid(iter)) {
+			return (index == (static_cast<const VIterator<T>&>(iter)).index) && (&vec == &(static_cast<const VIterator<T>&>(iter).vec));
+		}
+		else {
+			return false;
+		}
+
+	}
+	bool operator==(const IteratorInterface<T>& iter) const override { return equals(iter); }
+	bool operator!=(const IteratorInterface<T>& iter) const override { return !equals(iter); }
+
+	IteratorInterface<T>* copy() const override
+	{
+		return new VIterator<T>(vec, index);
+	}
+};
+
+template<typename T>
+Iterator<T> Vector<T>::begin() 
+{
+	return Iterator<T>(new VIterator<T>(*this, 0));
+}
+
+template<typename T>
+Iterator<T> Vector<T>::end()
+{
+	return Iterator<T>(new VIterator<T>(*this, sz - 1));
+}

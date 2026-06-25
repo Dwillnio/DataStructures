@@ -15,6 +15,7 @@
 #include "BinaryTree.h"
 #include "AVLTree.h"
 #include "Graph.h"
+#include "HashTable.h"
 
 #define MOVE_ENABLED
 
@@ -315,14 +316,36 @@ void MST_test()
 }
 //*/
 
+
+//	Overwrite hash<std::string> in "HashTable.h" for testing collision
+void HashTable_test()
+{
+	HashTable<std::string, int> age;
+	std::string T("Tom"), A("Alice"), J("Justin");
+
+	age.add(T, 21);
+	age.add(A, 17);
+	age.add(J, 13);
+
+	std::cout << age[T] << std::endl;
+	std::cout << age[J] << std::endl;
+	std::cout << age[A] << std::endl;
+
+	age.remove(T);
+
+	std::cout << age.stored_elements() << std::endl;
+
+	std::cout << age[A] << std::endl;
+	age.add(T, 21);
+	age.remove(T);
+	std::cout << age[A] << std::endl;
+
+}
+
 int main() {
-	Edge<int> e1{ 0,1,5 }, e2{ 2,3,6 }, e3{ 3,1,5 };
-	std::cout << (e1 == e2) << std::endl;
-	std::cout << (e1 < e2) << std::endl;
-	std::cout << (e1 == e3) << std::endl;
 
-
-	MST_test();
+	HashTable_test();
+	//MST_test();
 	/*
 	Graph<std::string, int> g;
 

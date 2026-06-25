@@ -1,24 +1,6 @@
 #pragma once
 
-template<typename T>
-class Iterator
-{
-public:
-	virtual T& get() = 0;
-	virtual const T& get() const = 0;
-
-	virtual Iterator<T>& move(int) = 0;
-	virtual Iterator<T>& next() = 0;
-	virtual Iterator<T>& prev() = 0;
-
-	virtual Iterator<T>& operator+(int) = 0;
-	virtual Iterator<T>& operator-(int) = 0;
-	virtual Iterator<T>& operator++() = 0;
-	virtual Iterator<T>& operator--() = 0;
-	
-	virtual bool equals(const Iterator<T>& iter) const = 0;
-	virtual bool operator==(const Iterator<T>& iter) const = 0;
-};
+#include "Iterator.h"
 
 template<typename T>
 class List

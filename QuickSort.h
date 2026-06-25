@@ -4,7 +4,7 @@
 #include "SortingAlgorithm.h"
 #include "Vector.h"
 
-//algorithm bad (i.e. O(n^2)) unless [] accesss is O(1). Need Iterators for better performance for LinkedList etc.
+//algorithm bad (i.e. O(n^2)) unless [] accesss is O(1)
 template<typename T> 
 class QuickSort : public SortingAlgorithm<T>
 {

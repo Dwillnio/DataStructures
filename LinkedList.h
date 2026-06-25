@@ -35,15 +35,92 @@ public:
 		next_ptr = n_ptr;
 	}
 
-	~Node()
+	Node<T>* traverse(int amount)
 	{
-		std::cout << "Deleting Node: " << data << std::endl;
+		if (amount < 0) return this;
+
+		Node<T>* current = this;
+		while (amount > 0) {
+			if (current == nullptr) return current;
+			current = current->next();
+			amount--;
+		}
+		return current;
 	}
+
+	~Node() {}
 
 };
 
 template<typename T>
-class LinkedList : public List<T>
+class LLIterator : public IteratorInterface<T> {
+private:
+	Node<T>* current;
+
+public:
+	LLIterator() = delete;
+
+	LLIterator(Node<T>* cur) : current(cur) {};
+
+	T& get() override
+	{
+		return current->get();
+	}
+
+	const T& get() const override
+	{
+		return current->get();
+	}
+
+	T& move(int amount) override
+	{
+		if (amount < 0) throw new std::exception("Backwards traversing on LinkedList not possible");
+		Node<T>* dest = current->traverse(amount);
+		if (dest == nullptr) throw new std::exception("Out of bounds");
+
+		current = dest;
+
+		return current->get();
+	}
+
+	T& next() override { return move(1); }
+
+	T& prev() override { return move(-1); }
+
+	T& operator+(int amount) override { return move(amount); }
+
+	T& operator-(int amount) override { return move(-amount); }
+
+	T& operator++() override { return next(); }
+
+	T& operator--() override { return prev(); }
+
+	bool equals(const IteratorInterface<T>& iter) const override
+	{
+		if (typeid(*this) == typeid(iter)) {
+			return current == (static_cast<const LLIterator<T>&>(iter)).current;
+		}
+		else {
+			return false;
+		}
+
+	}
+
+	bool operator==(const IteratorInterface<T>& iter) const override { return equals(iter); }
+	bool operator!=(const IteratorInterface<T>& iter) const override { return !equals(iter); }
+
+	bool is_beg() const override { return false; }
+	bool is_end() const override { return current->next() == nullptr; }
+	bool is_valid() const override { return current != nullptr; }
+
+	IteratorInterface<T>* copy() const override
+	{
+		return new LLIterator(current);
+	}
+};
+
+template<typename T>
+class LinkedList : public IteratorList<T>
 {
 private:
 	Node<T>* head;
@@ -304,5 +381,13 @@ public:
 		return *this;
 	}
 
+	Iterator<T> begin() override
+	{
+		return Iterator<T>(new LLIterator<T>(head));
+	}
 
+	Iterator<T> end() override
+	{
+		return Iterator<T>(new LLIterator<T>(tail()));
+	}
 };

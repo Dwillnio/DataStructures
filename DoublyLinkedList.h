@@ -1,5 +1,6 @@
 #pragma once
 #include "List.h"
+#include "Iterator.h"
 
 template<typename T>
 class DNode
@@ -44,11 +45,13 @@ public:
 };
 
 template<typename T>
-class DLLIterator : Iterator<T> {
+class DLLIterator : public IteratorInterface<T> {
 private:
 	DNode<T>* current;
 
 public:
+	DLLIterator() = delete;
+
 	DLLIterator(DNode<T>* cur) : current(cur) {};
 
 	T& get() override
@@ -61,29 +64,29 @@ public:
 		return current->get();
 	}
 
-	Iterator<T>& move(int amount) override
+	T& move(int amount) override
 	{
 		DNode<T>* dest = current->traverse(amount);
 		if (dest == nullptr) throw new std::exception("Out of bounds");
 
 		current = dest;
 
-		return *this;
+		return current->get();
 	}
 
-	Iterator<T>& next() override { return move(1); }
+	T& next() override { return move(1); }
 
-	Iterator<T>& prev() override { return move(-1); }
+	T& prev() override { return move(-1); }
 
-	Iterator<T>& operator+(int amount) override { return move(amount); }
+	T& operator+(int amount) override { return move(amount); }
 
-	Iterator<T>& operator-(int amount) override { return move(-amount); }
+	T& operator-(int amount) override { return move(-amount); }
 
-	Iterator<T>& operator++() override { return next(); }
+	T& operator++() override { return next(); }
 
-	Iterator<T>& operator--() override { return prev(); }
+	T& operator--() override { return prev(); }
 
-	bool equals(const Iterator<T>& iter) const override 
+	bool equals(const IteratorInterface<T>& iter) const override 
 	{ 
 		if (typeid(*this) == typeid(iter)) {
 			return current == (static_cast<const DLLIterator<T>&>(iter)).current;
@@ -94,11 +97,21 @@ public:
 		
 	}
 
-	bool operator==(const Iterator<T>& iter) const override { return equals(iter); }
+	bool operator==(const IteratorInterface<T>& iter) const override { return equals(iter); }
+	bool operator!=(const IteratorInterface<T>& iter) const override { return !equals(iter); }
+
+	bool is_beg() const override { return current->prev() == nullptr; }
+	bool is_end() const override { return current->next() == nullptr; }
+	bool is_valid() const override { return current != nullptr; }
+
+	IteratorInterface<T>* copy() const override
+	{
+		return new DLLIterator(current);
+	}
 };
 
 template<typename T>
-class DoublyLinkedList : public List<T>
+class DoublyLinkedList : public IteratorList<T>
 {
 private:
 	DNode<T>* head;
@@ -381,16 +394,15 @@ public:
 		return at(index);
 	}
 
-	DLLIterator<T> begin() 
+	Iterator<T> begin() override
 	{
-		return DLLIterator<T>(head);
+		return Iterator<T>(new DLLIterator<T>(head));
 	}
 
-	DLLIterator<T> end() 
+	Iterator<T> end() override
 	{
-		return DLLIterator<T>(tail);
+		return Iterator<T>(new DLLIterator<T>(tail));
 	}
-	
 	
 };
 
